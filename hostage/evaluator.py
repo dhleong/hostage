@@ -28,9 +28,10 @@ def _dryHandle(Result, delegate, method, *args, **kwargs):
 
     params = ",".join([repr(p) for p in delegate.params])
     args = ",".join([repr(a) for a in args])
-    kwargs = ",".join(["%s=%s" % (k, repr(v)) for k, v in kwargs])
-    if kwargs:
+    kwargs = ",".join(["%s=%s" % (k, repr(v)) for k, v in kwargs.iteritems()])
+    if kwargs and args:
         kwargs = "," + kwargs
+
     print("* DRYRUN: %s(%s).%s(%s%s)" % (cls, params, met, args, kwargs))
     return Result(True)
 

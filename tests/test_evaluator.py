@@ -43,6 +43,15 @@ def test_toDryRun(dryrun, capsys):
     out, _ = capsys.readouterr()
     assert out == "* DRYRUN: SimpleEvaluator().succeed('Serenity')\n"
 
+def test_toDryRun_kwargs(dryrun, capsys):
+    r = verify(SimpleEvaluator()).succeed(val="Serenity")
+    assert isinstance(r, Result)
+    assert r.value == True
+
+    out, _ = capsys.readouterr()
+    assert out == "* DRYRUN: SimpleEvaluator().succeed(val='Serenity')\n"
+
+
 
 class TestVerifyBase:
     """Some quick tests to check verify() in "real world"
