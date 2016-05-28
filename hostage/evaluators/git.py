@@ -41,9 +41,12 @@ class Log(Execute):
     def _toCli(path, grep, invertGrep, pretty):
         args = ["git", "log", path]
 
-        for item in grep:
-            args.append(\
-                    "--grep=" + item.replace("#", "\#"))
+        if isinstance(grep, basestring):
+            for item in grep:
+                args.append(\
+                        "--grep=" + item.replace("#", "\#"))
+        elif grep:
+            args.append("--grep=" + grep.replace("#", "\#"))
 
         if invertGrep:
             args.append("--invert-grep")

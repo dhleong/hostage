@@ -21,3 +21,9 @@ class TestTag:
         deleted = tag.delete()
         assert deleted == True
         assert tag.exists() == False
+
+class TestLog:
+    def test_output(self):
+        log = git.Log(path="946b5ac..3dd3811", pretty="format:- %s")
+        res = log.output()
+        assert res == "- Convert git stuff to new Evaluator"
