@@ -18,52 +18,70 @@ def _hasAg():
 class File(Evaluator):
 
     def __init__(self, path):
+        super(File, self).__init__(path)
         self.path = path
+
+    def contents(self):
+        if self.exists():
+            with open(self.path) as fp:
+                return fp.read()
 
     def exists(self):
         return os.path.exists(self.path)
 
-    def succeeds(self):
-        return self.exists(self)
+class Execute(Evaluator):
 
+    def __init__(self, *params):
+        """Evaluator for executing something
+        in the shell.
 
-def execute(*commands):
-    """Execute the given commands as subprocess and resolve
-    to the output of the command
-    """
-    try:
-        return Result(subprocess.check_output(commands))
-    except subprocess.CalledProcessError, e:
-        return Result()
+        :*params: If a single string, will be
+        split up by spaces. For more complicated
+        commands, pass as an array
+        """
+        super(Execute, self).__init__(*params)
+        if len(params) == 1 and isinstance(params[0], basestring):
+            self.params = params[0].split(" ")
+        elif len(params) == 1 and type(params[0]) is list:
+            self.params = params[0]
+        else:
+            self.params = list(params)
 
-def execStatus(*commands):
-    """Execute the commands and resolve to True for a successful
-    result. The output goes to stdout as if executing in a shell
-    """
-    try:
-        return Result(0 == subprocess.check_call(commands))
-    except subprocess.CalledProcessError, e:
-        return Result()
+    def output(self):
+        """Capture the output of a successful call, 
+        else return False
+        """
+        try:
+            return subprocess.check_output(self.params)
+        except subprocess.CalledProcessError, e:
+            return False
+    
+    def succeeds(self, silent=True):
+        """Ensure an exit code of 0. If silent=True,
+        the output will be suppressed.
+        """
+        try:
+            if silent:
+                subprocess.check_output(self.params)
+            else:
+                subprocess.check_call(self.params)
+            return True
+        except subprocess.CalledProcessError, e:
+            return False
 
-def findFile(path):
-    """Resolves to True if the file path exists"""
-    return Result(os.path.exists(path))
+class Grep(Execute):
+    
+    def __init__(self, text):
+        """Executes grep (or `ag`, if available),
+        and returns the output.
+        """
+        if _hasAg():
+            super(Grep, self).__init__("ag", text)
+        else:
+            super(Grep, self).__init__("grep", "-R", text, ".")
 
-def grep(text):
-    """Resolves to any found text. Prefers `ag` if installed"""
-    if _hasAg():
-        # if `ag` is installed, prefer it
-        return execute("ag", text)
-    else:
-        return execute("grep", "-R", text, ".")
-
-def grepStatus(text):
-    """As with execStatus, dumps the output to stdout
-    regardless of the result code (but resolves to True
-    or None based on status)
-    """
-    if _hasAg():
-        # if `ag` is installed, prefer it
-        return execStatus("ag", text)
-    else:
-        return execStatus("grep", "-R", text, ".")
+    def foundAny(self, silent=True):
+        """Returns True if any matching text was found.
+        If silent=False, the found text will not be suppressed
+        """
+        return self.succeeds(silent)

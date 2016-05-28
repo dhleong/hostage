@@ -25,15 +25,20 @@ def _justVerify(Result, delegate, method, *args, **kwargs):
 def _dryHandle(Result, delegate, method, *args, **kwargs):
     cls = delegate.__class__.__name__
     met = method.__name__
+
+    params = ",".join([repr(p) for p in delegate.params])
     args = ",".join([repr(a) for a in args])
     kwargs = ",".join(["%s=%s" % (k, repr(v)) for k, v in kwargs])
     if kwargs:
         kwargs = "," + kwargs
-    print("* DRYRUN: %s.%s(%s%s)" % (cls, met, args, kwargs))
+    print("* DRYRUN: %s(%s).%s(%s%s)" % (cls, params, met, args, kwargs))
     return Result(True)
 
 class Evaluator:
     __metaclass__ = ABCMeta
+
+    def __init__(self, *params):
+        self.params = params
 
     def _toVerifier(self, Result):
         return _Proxy(self, _justVerify, Result)
