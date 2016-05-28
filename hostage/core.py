@@ -2,8 +2,11 @@
 # Core, base classes for hostage.py
 #
 
+import sys
 from abc import ABCMeta, abstractmethod
 import inspect
+
+from evaluator import Evaluator
 
 class Result:
 
@@ -56,3 +59,13 @@ class Handler:
     def call(self, *args):
         pass
 
+def verify(value):
+
+    if isinstance(value, Evaluator):
+        if "--dryrun" in sys.argv:
+            return value._toDryVerifier(Result)
+
+        else:
+            return value._toVerifier(Result)
+    else:
+        return Result(value)

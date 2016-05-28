@@ -5,7 +5,7 @@
 import os.path
 import subprocess
 
-from ..core import Result
+from ..core import Evaluator, Result
 
 def _hasAg():
     # TODO we should probably cache this result:
@@ -14,6 +14,18 @@ def _hasAg():
         return True
     except:
         return False
+
+class File(Evaluator):
+
+    def __init__(self, path):
+        self.path = path
+
+    def exists(self):
+        return os.path.exists(self.path)
+
+    def succeeds(self):
+        return self.exists(self)
+
 
 def execute(*commands):
     """Execute the given commands as subprocess and resolve
