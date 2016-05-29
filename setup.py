@@ -6,7 +6,11 @@ from setuptools import setup
 
 packages = ['hostage']
 
-requires = ['requests>=2.10.0', 'PyGithub>=1.26.0']
+requires = [
+    'requests>=2.10.0', 
+    'PyGithub>=1.26.0', 
+    'google-api-python-client>=1.3.2'
+]
 
 test_requirements = ['pytest>=2.8.0', 'responses>=0.5.1']
 
