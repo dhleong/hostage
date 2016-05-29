@@ -86,9 +86,38 @@ class Milestone(_GHItem):
 
         self.name = name
         self.id = id
+        self._inst = None
 
     def exists(self):
-        return self._getId() is not None
+        return self._getInst() is not None
+
+    def edit(self, **kwargs):
+        """Edit the milestone
+
+        :title: string New title
+        :state: string "open" or "closed"
+        :description: string 
+        :due_on: date
+
+        """
+        inst = self._getInst()
+        if not inst: return None
+
+        if not 'title' in kwargs:
+            kwargs['title'] = self.name
+
+        inst.edit(**kwargs)
+
+        return True
+
+    def _getInst(self):
+        if self._inst: return self._inst
+        if self.id:
+            inst = self.config.repo().get_milestone(self.id)
+            self._inst = inst
+            return inst
+        self._getId()
+        return self._inst
 
     def _getId(self):
         if self.id == False: return None
@@ -101,5 +130,6 @@ class Milestone(_GHItem):
             self.id = False
             return None
 
-        self.id = ms[0]
+        self._inst = ms[0]
+        self.id = ms[0].number
         return self.id
