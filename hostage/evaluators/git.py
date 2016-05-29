@@ -55,3 +55,12 @@ class Log(Execute):
             args.append("--pretty=" + pretty)
 
         return args
+
+class Repo(Evaluator):
+
+    """Git Repo Utilities"""
+
+    def root(self):
+        path = Execute("git rev-parse --show-toplevel").output()
+        if path:
+            return path.strip()

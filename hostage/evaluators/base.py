@@ -19,7 +19,7 @@ class File(Evaluator):
 
     def __init__(self, path):
         super(File, self).__init__(path)
-        self.path = path
+        self.path = os.path.expanduser(path)
 
     def contents(self):
         if self.exists():

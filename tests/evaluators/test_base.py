@@ -34,6 +34,15 @@ class TestFile:
         match = fEval.filtersTo(RegexFilter("(bar).*"))
         assert match == "bar"
 
+    def test_filtersTo_fail(self, tmpdir):
+        f = tmpdir.join("foo")
+        f.write("buz-baz")
+        fEval = File(str(f.realpath()))
+        match = fEval.filtersTo(RegexFilter("(bar).*"))
+        assert match == None
+
+
+
 
 class TestExecute:
     def test_initWithString(self):

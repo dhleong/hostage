@@ -83,4 +83,6 @@ class RegexFilter(Filter):
         self.regex = re.compile(regex)
 
     def run(self, value):
-        return self.regex.findall(value)[0]
+        m = self.regex.search(value)
+        if m:
+            return m.group(1)
