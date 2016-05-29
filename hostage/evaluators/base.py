@@ -26,6 +26,15 @@ class File(Evaluator):
             with open(self.path) as fp:
                 return fp.read()
 
+    def delete(self):
+        """Returns True if we were deleted, else 
+        False if we didn't exist in the first place
+        """
+        if self.exists():
+            os.remove(self.path)
+            return True
+        return False
+
     def exists(self):
         return os.path.exists(self.path)
 
