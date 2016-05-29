@@ -5,7 +5,7 @@
 import os.path
 import subprocess
 
-from ..core import Evaluator, Result
+from ..core import Evaluator, Filter, Result
 
 def _hasAg():
     # TODO we should probably cache this result:
@@ -28,6 +28,16 @@ class File(Evaluator):
 
     def exists(self):
         return os.path.exists(self.path)
+
+    def filtersTo(self, theFilter):
+        if not isinstance(theFilter, Filter):
+            raise Exception("%s is not a Filter" % theFilter)
+
+        contents = self.contents()
+        if not contents:
+            return None
+
+        return theFilter.run(self.contents())
 
 class Execute(Evaluator):
 

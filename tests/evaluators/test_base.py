@@ -3,6 +3,7 @@
 # Core class tests
 #
 
+from hostage import RegexFilter
 from hostage.evaluators.base import *
 
 class TestFile:
@@ -25,6 +26,14 @@ class TestFile:
     def test_noContents(self, tmpdir):
         fEval = File("foo")
         assert fEval.contents() is None
+
+    def test_filtersTo(self, tmpdir):
+        f = tmpdir.join("foo")
+        f.write("bar-baz")
+        fEval = File(str(f.realpath()))
+        match = fEval.filtersTo(RegexFilter("(bar).*"))
+        assert match == "bar"
+
 
 class TestExecute:
     def test_initWithString(self):

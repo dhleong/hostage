@@ -2,9 +2,10 @@
 # Core, base classes for hostage.py
 #
 
+import re
 import sys
-from abc import ABCMeta, abstractmethod
 import inspect
+from abc import ABCMeta, abstractmethod
 
 from evaluator import Evaluator
 
@@ -69,3 +70,17 @@ def verify(value):
             return value._toVerifier(Result)
     else:
         return Result(value)
+
+class Filter:
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def run(self, value):
+        pass
+
+class RegexFilter(Filter):
+    def __init__(self, regex):
+        self.regex = re.compile(regex)
+
+    def run(self, value):
+        return self.regex.findall(value)[0]

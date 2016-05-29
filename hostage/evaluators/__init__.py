@@ -1,6 +1,6 @@
 
 from .base import *
-from .gradle import *
 
 import git
+import gradle
 import slack
