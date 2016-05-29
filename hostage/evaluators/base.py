@@ -41,7 +41,7 @@ class File(Evaluator):
 
 class Execute(Evaluator):
 
-    def __init__(self, *params):
+    def __init__(self, *params, **kwargs):
         """Evaluator for executing something
         in the shell.
 
@@ -56,13 +56,15 @@ class Execute(Evaluator):
             self.params = params[0]
         else:
             self.params = list(params)
+        self.kwargs = kwargs
 
     def output(self):
         """Capture the output of a successful call, 
         else return False
         """
         try:
-            return subprocess.check_output(self.params)
+            return subprocess.check_output(self.params,\
+                    **self.kwargs)
         except subprocess.CalledProcessError, e:
             return False
     
@@ -72,9 +74,11 @@ class Execute(Evaluator):
         """
         try:
             if silent:
-                subprocess.check_output(self.params)
+                subprocess.check_output(self.params,\
+                        **self.kwargs)
             else:
-                subprocess.check_call(self.params)
+                subprocess.check_call(self.params,\
+                        **self.kwargs)
             return True
         except subprocess.CalledProcessError, e:
             return False
