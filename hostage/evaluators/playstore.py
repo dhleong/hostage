@@ -16,6 +16,8 @@ class Update(Evaluator):
 
     def __init__(self, package, apk, whatsnew, track='beta',\
             log=True, service=None):
+        super(Update, self).__init__(package, apk, whatsnew, track, log)
+
         self.package = package
         self.apk = apk
         self.whatsnew = whatsnew
