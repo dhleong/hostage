@@ -82,7 +82,7 @@ class _GHItem(Evaluator):
         else:
             self.config = Config()
 
-        self.gh = config.gh
+        self.gh = self.config.gh
 
 class Milestone(_GHItem):
     def __init__(self, name, id=None, config=None):
