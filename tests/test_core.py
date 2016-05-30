@@ -103,4 +103,19 @@ class TestResultCalls:
         assert name[0] == None
 
     def test_chain(self):
-        pass
+        # then() executes the handler iff the value is truthy;
+        #  subsequent chaned then()s should not execute
+        #  if their parent did not
+        name = ["Mal", "Reynolds"]
+        def cb1(arg):
+            name[0] = arg
+        def cb2(arg):
+            name[1] = "Tightpants"
+
+        Result(None).then(cb1).then(cb2)
+        assert name[0] == "Mal"
+        assert name[1] == "Reynolds"
+
+        Result("Captain").then(cb1).then(cb2)
+        assert name[0] == "Captain"
+        assert name[1] == "Tightpants"

@@ -18,15 +18,12 @@ class Result:
         if not self.value:
             self._invoke(handler)
 
-        # we return a bogus value so you can keep stringing along handlers with then()
-        return Result("-bogus-")
-
     def then(self, handler):
         if self.value:
             self._invoke(handler)
 
-        # we return a bogus value so you can keep stringing along handlers with then()
-        return Result("-bogus-")
+        # we return the same value for correct chaining
+        return Result(self.value)
 
     def valueElse(self, handler):
         if self.value:
