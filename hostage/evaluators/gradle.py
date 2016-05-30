@@ -1,7 +1,31 @@
 
 import re
 
-from ..core import RegexFilter
+from .base import Execute, File
+from ..core import Evaluator, RegexFilter
+
+class Gradle(Execute):
+
+    def __init__(self, exe=None, silent=False):
+        self.exe = self._pickExe(exe)
+        self.silent = silent
+
+    def executes(self, *args):
+        exe = Execute(*args)
+        exe.params.insert(0, self.exe)
+        return exe.succeeds(silent=self.silent)
+
+    def hasLocalWrapper(self):
+        return self.exe == './gradlew'
+
+    def _pickExe(self, provided):
+        if provided: return provided
+
+        # TODO windows?
+        if File('./gradlew').exists():
+            return './gradlew'
+
+        return 'gradle'
 
 class Def(RegexFilter):
     """A filter that finds the value of a `def` statement
