@@ -42,11 +42,13 @@ class Log(Execute):
         args = ["git", "log", path]
 
         if isinstance(grep, basestring):
+            args.append("--grep=" + grep.replace("#", "\#"))
+        elif type(grep) is list:
             for item in grep:
                 args.append(\
                         "--grep=" + item.replace("#", "\#"))
-        elif grep:
-            args.append("--grep=" + grep.replace("#", "\#"))
+        else:
+            raise Exception("Unexpected arg for grep: %s" % repr(grep))
 
         if invertGrep:
             args.append("--invert-grep")

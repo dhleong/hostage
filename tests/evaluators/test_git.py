@@ -27,3 +27,19 @@ class TestLog:
         log = git.Log(path="946b5ac..3dd3811", pretty="format:- %s")
         res = log.output()
         assert res == "- Convert git stuff to new Evaluator"
+
+    def test_grepList(self):
+        log = git.Log(path="946b5ac..cfa1271", 
+                grep=["test for git.Log", "github milestone"],
+                pretty="format:%s")
+        res = log.output()
+        assert res == "Support editing github milestone\n" + \
+                      "Add test for git.Log"
+
+    def test_grepString(self):
+        log = git.Log(path="946b5ac..cfa1271", 
+                grep="test for git.Log",
+                pretty="format:%s")
+        res = log.output()
+        assert res == "Add test for git.Log"
+
