@@ -33,12 +33,12 @@ class Edit(Evaluator):
     def _await(self):
         editor = os.environ.get("EDITOR", "vim")
         if editor[-3:].lower() == "vim":
-            self._vim()
+            self._vim(editor)
         else:
             raise Exception("Unsupported editor `%s`" % editor)
 
-    def _vim(self):
-        args = ["vim"]
+    def _vim(self, exe="vim"):
+        args = [exe]
 
         env = os.environ.copy()
 
