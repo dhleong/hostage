@@ -84,6 +84,7 @@ class Update(Evaluator):
                 editId=editId, packageName=self.package).execute()
 
             self._log('Edit "%s" has been committed!' % (commitRequest['id']))
+            return True
 
         except client.AccessTokenRefreshError:
             print('The credentials have been revoked or expired')
