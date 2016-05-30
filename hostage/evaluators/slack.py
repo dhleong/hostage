@@ -9,6 +9,7 @@ from ..core import Evaluator
 
 class Notifier(Evaluator):
     def __init__(self, url):
+        super(Notifier, self).__init__(url)
         self.url = url
 
     def notify(self, payload):
