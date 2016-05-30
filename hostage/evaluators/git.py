@@ -5,6 +5,7 @@ from .base import Execute
 class Tag(Evaluator):
 
     def __init__(self, name):
+        super(Tag, self).__init__(name)
         self.name = name
 
     def create(self, force=False):
