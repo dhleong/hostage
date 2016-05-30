@@ -4,9 +4,10 @@ import re
 from .base import Execute, File
 from ..core import Evaluator, RegexFilter
 
-class Gradle(Execute):
+class Gradle(Evaluator):
 
     def __init__(self, exe=None, silent=False):
+        super(Gradle, self).__init__(exe, silent)
         self.exe = self._pickExe(exe)
         self.silent = silent
 
