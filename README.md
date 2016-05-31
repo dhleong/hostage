@@ -13,6 +13,9 @@ Hostage is simple. Hostage *wants* to be released.
 
 ## How
 
+    pip install hostage
+
+
 Here's a sample release script for Android, with some inline documentation:
 
 ```python
