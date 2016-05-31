@@ -37,7 +37,7 @@ requires = [
     'google-api-python-client>=1.3.2'
 ]
 
-test_requirements = ['pytest>=2.8.0', 'responses>=0.5.1', 'mock']
+test_requirements = ['pytest>=2.6.0', 'responses>=0.5.1', 'mock']
 
 
 with open('hostage/__init__.py', 'r') as fp:
