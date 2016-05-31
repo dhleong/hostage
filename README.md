@@ -1,4 +1,4 @@
-hostage [![PyPI](http://img.shields.io/pypi/v/hostage.svg?style=flat)](https://pypi.python.org/pypi/hostage)  
+hostage [![PyPI](http://img.shields.io/pypi/v/hostage.svg?style=flat)](https://pypi.python.org/pypi/hostage) [![Build Status](http://img.shields.io/travis/dhleong/hostage.svg?style=flat)](https://travis-ci.org/dhleong/hostage)
 =======
 
 *You'll WANT to release it*
