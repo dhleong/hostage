@@ -102,6 +102,23 @@ class TestResultCalls:
         assert val == "Mal"
         assert name[0] == None
 
+    def test_valueElseFun(self):
+        # if you provide a function to valueElse,
+        #  its return value will be returned
+        name = ["Reynolds"]
+        def cb(arg):
+            name[0] = "Captain"
+            return "Tightpants"
+
+        # no value? return callback's return
+        val = Result(None).valueElse(cb)
+        assert val == "Tightpants"
+
+        # value? don't exec, but do return
+        val = Result("Mal").valueElse(cb)
+        assert val == "Mal"
+
+
     def test_chain(self):
         # then() executes the handler iff the value is truthy;
         #  subsequent chaned then()s should not execute

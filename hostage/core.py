@@ -16,7 +16,7 @@ class Result:
 
     def orElse(self, handler):
         if not self.value:
-            self._invoke(handler)
+            return self._invoke(handler)
 
     def then(self, handler):
         if self.value:
@@ -33,11 +33,11 @@ class Result:
 
     def _invoke(self, handler):
         if inspect.isclass(handler):
-            handler(self.value).invoke()
+            return handler(self.value).invoke()
         elif inspect.isfunction(handler) or inspect.ismethod(handler):
-            handler(self.value)
+            return handler(self.value)
         else:
-            handler.invoke(self.value)
+            return handler.invoke(self.value)
 
 class Handler:
     __metaclass__ = ABCMeta
