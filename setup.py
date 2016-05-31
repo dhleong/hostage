@@ -3,7 +3,7 @@
 import sys
 import re
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 class PyTest(TestCommand):
@@ -25,7 +25,7 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-packages = ['hostage']
+packages = find_packages(exclude=["tests", "tests.*"])
 
 requires = [
     'requests>=2.10.0', 
