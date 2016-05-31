@@ -42,8 +42,6 @@ class TestFile:
         assert match == None
 
 
-
-
 class TestExecute:
     def test_initWithString(self):
         assert Execute("foo bar").params == ['foo', 'bar']
@@ -66,5 +64,9 @@ class TestExecute:
 
 class TestGrep:
     def test_foundAny(self):
-        result = Grep("test").foundAny()
+        result = Grep("TestGrep").foundAny()
         assert result == True
+
+    def test_foundAny(self):
+        result = Grep("TestGrep", inDir="hostage").foundAny(silent=False)
+        assert result == False

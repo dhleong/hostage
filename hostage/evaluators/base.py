@@ -94,14 +94,14 @@ class Execute(Evaluator):
 
 class Grep(Execute):
     
-    def __init__(self, text):
+    def __init__(self, text, inDir="."):
         """Executes grep (or `ag`, if available),
         and returns the output.
         """
         if _hasAg():
-            super(Grep, self).__init__("ag", text)
+            super(Grep, self).__init__("ag", text, inDir)
         else:
-            super(Grep, self).__init__("grep", "-R", text, ".")
+            super(Grep, self).__init__("grep", "-R", text, inDir)
 
     def foundAny(self, silent=True):
         """Returns True if any matching text was found.
