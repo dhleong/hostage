@@ -25,6 +25,10 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py sdist upload')
+    sys.exit()
+
 packages = find_packages(exclude=["tests", "tests.*"])
 
 requires = [
