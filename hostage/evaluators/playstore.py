@@ -33,6 +33,8 @@ class Update(Evaluator):
 
         if service:
             self._service = service
+        else:
+            self._service = None
 
     def publish(self):
         service = self._getService()
