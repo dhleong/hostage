@@ -14,6 +14,19 @@ import responses
 
 from hostage import playstore
 
+@pytest.fixture
+def secrets(tmpdir, request):
+    update.tmpdir = tmpdir
+    oldDir = tmpdir.chdir()
+
+    tmpdir.join('client_secrets.json').write("")
+
+    def fin():
+        oldDir.chdir()
+        
+    request.addfinalizer(fin)
+    return tmpdir
+
 class TestUpdateVerify:
 
     def test_package(self):
@@ -44,13 +57,13 @@ class TestUpdateVerify:
 
         assert 'track' in str(exc.value)
 
-    def test_track_default(self):
+    def test_track_default(self, secrets):
         playstore.Update(
                 package="co.serenity",
                 apk='path/to/firefly.apk',
                 whatsnew=None)
 
-    def test_track_pass(self):
+    def test_track_pass(self, secrets):
         playstore.Update(
                 package="co.serenity",
                 apk='path/to/firefly.apk',
@@ -66,13 +79,24 @@ class TestUpdateVerify:
 
         assert 'whatsnew' in str(exc.value)
 
-    def test_whatsnew_pass(self):
+    def test_whatsnew_pass(self, secrets):
         playstore.Update(
                 package="co.serenity",
                 apk='path/to/firefly.apk',
                 whatsnew={
                     'en-US': "Still flyin'"
                     })
+
+    def test_secretsNotProvided(self):
+        with pytest.raises(Exception) as exc:
+            playstore.Update(
+                    package="co.serenity",
+                    apk='path/to/firefly.apk',
+                    whatsnew={
+                        'en-US': "Still flyin'"
+                        })
+
+        assert 'client_secrets.json' in str(exc.value)
 
 class MockRequest:
     def __init__(self, result):
@@ -128,6 +152,11 @@ class MockService:
 
 @pytest.fixture
 def update(tmpdir, request):
+
+    # ch eagerly and prepare the secrets.json
+    oldDir = tmpdir.chdir()
+    tmpdir.join('client_secrets.json').write("")
+
     service = MockService()
     update = playstore.Update(
             package='co.serenity',
@@ -136,9 +165,7 @@ def update(tmpdir, request):
                 'en-US': "Still flyin'"
                 },
             service=service)
-
     update.tmpdir = tmpdir
-    oldDir = tmpdir.chdir()
 
     def fin():
         oldDir.chdir()

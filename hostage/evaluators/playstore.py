@@ -2,6 +2,8 @@
 # Google Play Store publishing, etc.
 #
 
+import os
+
 from apiclient import sample_tools
 from oauth2client import client
 
@@ -15,6 +17,7 @@ class Update(Evaluator):
     """Represents an update to a Playstore listing"""
 
     def __init__(self, package, apk, whatsnew, track='beta',\
+            secrets_json="client_secrets.json",\
             log=True, service=None):
         super(Update, self).__init__(package, apk, whatsnew, track, log)
 
@@ -22,6 +25,7 @@ class Update(Evaluator):
         self.apk = apk
         self.whatsnew = whatsnew
         self.track = track
+        self.secretsJson = secrets_json
         self._verifyParams()
 
         if log:
@@ -103,7 +107,7 @@ class Update(Evaluator):
               'androidpublisher',
               'v2',
               __doc__,
-              __file__,
+              os.path.join(os.getcwd(), "any"), # it looks in the dir of this file for creds.json
               scope=_SCOPE)
 
         self._service = service
@@ -126,3 +130,7 @@ class Update(Evaluator):
             for (lang, msg) in self.whatsnew.iteritems():
                 if len(msg) > 500:
                     raise Exception("`whatsnew` for `%s` is > 500 chars" % lang)
+
+        secretsJsonFile = File(self.secretsJson)
+        if not secretsJsonFile.exists():
+            raise Exception("Must create `%s` file with information from the Play Store account settings" % os.path.realpath(secretsJsonFile.path))
