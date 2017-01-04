@@ -6,12 +6,15 @@
 from __future__ import absolute_import
 
 import os
+from urllib import urlencode
 
 from github import Github
 
 from . import git
 from .base import File
+from .http import Http
 from ..core import Evaluator, RegexFilter
+
 
 class Config:
     """Reusable config object"""
@@ -58,8 +61,7 @@ class Config:
 
         # local path?
         if self._root:
-            token = File(self._root + "/.github.token")\
-                    .contents()
+            token = File(self._root + "/.github.token").contents()
             if token: return token
 
         # hub?
@@ -84,6 +86,7 @@ class _GHItem(Evaluator):
 
         self.gh = self.config.gh
 
+
 class Milestone(_GHItem):
     def __init__(self, name, id=None, config=None):
         super(Milestone, self).__init__(config, name)
@@ -100,14 +103,14 @@ class Milestone(_GHItem):
 
         :title: string New title
         :state: string "open" or "closed"
-        :description: string 
+        :description: string
         :due_on: date
 
         """
         inst = self._getInst()
         if not inst: return None
 
-        if not 'title' in kwargs:
+        if 'title' not in kwargs:
             kwargs['title'] = self.name
 
         inst.edit(**kwargs)
@@ -124,7 +127,7 @@ class Milestone(_GHItem):
         return self._inst
 
     def _getId(self):
-        if self.id == False: return None
+        if self.id is False: return None
         elif self.id: return self.id
 
         allMs = self.config.repo().get_milestones()
@@ -137,3 +140,92 @@ class Milestone(_GHItem):
         self._inst = ms[0]
         self.id = ms[0].number
         return self.id
+
+
+class Release(_GHItem):
+
+    """Update a Github Release"""
+
+    def __init__(self, tag, config=None, http=None):
+        """TODO: to be defined1.
+
+        :tag: Name of the tag for the release
+        :config: TODO
+
+        """
+        super(Release, self).__init__(config, tag)
+
+        self.tag = tag
+        self._inst = None
+
+        if http is None:
+            self._http = Http()
+        else:
+            self._http = http
+
+    def create(self, name=None, body=None, draft=False, prerelease=False):
+        """Create the release
+
+        :name: string
+        :body: string Text describing the contents of the tag
+        :draft: bool True to create an "unpublished" release
+        :prerelease: bool True to identify as "pre-release"
+        :returns: TODO
+
+        """
+        if name is None:
+            name = self.tag
+
+        self._inst = self.config.repo().create_git_release(
+            self.tag,
+            name,
+            body,
+            draft,
+            prerelease)
+
+        return True
+
+    def exists(self):
+        return self._getInst() is not None
+
+    def uploadFile(self, path, contentType, label=None):
+        """TODO: Docstring for uploadFile.
+
+        :path: TODO
+        :contentType: TODO
+        :label: TODO
+        :returns: TODO
+
+        """
+        asFile = File(path)
+        if not asFile.exists():
+            return False
+        path = asFile.path
+
+        inst = self._getInst()
+        if not inst: return None
+
+        repo = self.config.repo()
+        urlParams = (inst.upload_url, repo.owner, repo.name, str(inst.id))
+        uploadUrl = "https://%s/repos/%s/%s/releases/%s/assets/" % urlParams
+
+        params = {'name': os.path.basename(path)}
+        if label is not None:
+            params['label'] = label
+
+        uploadUrl += '?' + urlencode(params)
+
+        with open(path, 'rb') as fileData:
+            return self._http.post(uploadUrl,
+                    body=fileData,
+                    headers={
+                        'Authorization': 'token %s' % self.config.token,
+                        'Content-Type': contentType})
+
+        return False
+
+    def _getInst(self):
+        if self._inst: return self._inst
+        inst = self.config.repo().get_release(self.tag)
+        self._inst = inst
+        return inst
