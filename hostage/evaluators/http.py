@@ -144,12 +144,12 @@ class Http(Evaluator):
 
     def _request(self, method, url, params=None, body=None, headers=None):
         """Prepare a request, optionally with params or body.
-        Throws an HTTPError ONLY on 401
+        Throws an HTTPError on error
 
         :method: GET/POST/PUT
-        :url: everything after https://api.github.com/
+        :url: Full url
         :params: Optional, dict of params
-        :body: Optional, raw string body
+        :body: Optional, raw string/binary body
         :returns: a HttpResult
 
         """
@@ -160,14 +160,6 @@ class Http(Evaluator):
             data = body
         else:
             data = None
-
-        authHeader = "token %s" % self._token
-        if not headers:
-            headers = {
-                "Authorization": authHeader
-            }
-        else:
-            headers['Authorization'] = authHeader
 
         if method == 'POST' and body:
             if type(body) == file:

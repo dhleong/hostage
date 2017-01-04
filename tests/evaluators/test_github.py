@@ -148,14 +148,14 @@ class TestRelease:
             "id": 12,
             "tag": "fixed-coil",
             "title": "fixed-coil",
-            "upload_url": "uploads.foo.bar"
+            "upload_url": "https://upload.github.com/releases/id/{?name,label}"
         })
 
         r = github.Release("fixed-coil", config=conf, http=http)
         r.uploadFile("path-to/firefly.zip", "application/zip")
 
-        expectedUrl = "https://uploads.foo.bar/" +\
-            "repos/firefly/serenity/releases/12/assets/" +\
+        expectedUrl = "https://upload.github.com/" +\
+            "releases/id/" +\
             "?name=firefly.zip"
         http.post.assert_called_once()
         assert http.post.call_args[0][0] == expectedUrl

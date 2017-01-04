@@ -205,9 +205,8 @@ class Release(_GHItem):
         inst = self._getInst()
         if not inst: return None
 
-        repo = self.config.repo()
-        urlParams = (inst.upload_url, repo.owner, repo.name, str(inst.id))
-        uploadUrl = "https://%s/repos/%s/%s/releases/%s/assets/" % urlParams
+        uploadUrl = inst.upload_url
+        uploadUrl = uploadUrl[0:uploadUrl.find('{')]
 
         params = {'name': os.path.basename(path)}
         if label is not None:
