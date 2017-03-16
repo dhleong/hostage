@@ -28,8 +28,9 @@ class Tag(Evaluator):
         return len(exe.output()) > 0
 
     def get_created_date(self):
-        exe = Execute("git", "tag", "-l", self.name,
-                "--format='%(creatordate:iso-strict)'")
+        exe = Execute("git", "log", "-1",
+                "--format=%ai",  # author-created date in iso-ish format
+                self.name)       # (note: travis doesn't have iso-strict)
         dateString = exe.output()
         if len(exe.output()) > 0:
             return dateutil.parser.parse(dateString)

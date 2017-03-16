@@ -30,6 +30,9 @@ class TestTag:
         assert date.year == 2017
         assert date.month == 1
         assert date.day == 3
+        assert date.hour == 19
+        assert date.minute == 30
+        assert date.tzinfo is not None
 
 
 class TestLog:
