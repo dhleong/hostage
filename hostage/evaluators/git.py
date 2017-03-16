@@ -1,6 +1,9 @@
 
+import dateutil.parser
+
 from ..core import Evaluator
 from .base import Execute
+
 
 class Tag(Evaluator):
 
@@ -24,6 +27,13 @@ class Tag(Evaluator):
         exe = Execute("git", "tag", "-l", self.name)
         return len(exe.output()) > 0
 
+    def get_created_date(self):
+        exe = Execute("git", "tag", "-l", self.name,
+                "--format=%(creatordate:iso-strict)")
+        dateString = exe.output()
+        if len(exe.output()) > 0:
+            return dateutil.parser.parse(dateString)
+
     def push(self, remote, force=False):
         args = ["git", "push", remote, self.name]
 
@@ -32,11 +42,12 @@ class Tag(Evaluator):
 
         return Execute(args).succeeds()
 
+
 class Log(Execute):
 
     def __init__(self, path, grep=[], invertGrep=False, pretty=None):
-        super(Log, self).__init__(\
-                Log._toCli(path, grep, invertGrep, pretty))
+        super(Log, self).__init__(
+            Log._toCli(path, grep, invertGrep, pretty))
 
     @staticmethod
     def _toCli(path, grep, invertGrep, pretty):
@@ -46,8 +57,8 @@ class Log(Execute):
             args.append("--grep=" + grep.replace("#", "\#"))
         elif type(grep) is list:
             for item in grep:
-                args.append(\
-                        "--grep=" + item.replace("#", "\#"))
+                args.append(
+                    "--grep=" + item.replace("#", "\#"))
         else:
             raise Exception("Unexpected arg for grep: %s" % repr(grep))
 
@@ -58,6 +69,7 @@ class Log(Execute):
             args.append("--pretty=" + pretty)
 
         return args
+
 
 class Repo(Evaluator):
 
