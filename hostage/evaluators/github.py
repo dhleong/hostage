@@ -87,6 +87,24 @@ class _GHItem(Evaluator):
         self.gh = self.config.gh
 
 
+class Issue(_GHItem):
+    def __init__(self, id, config=None, inst=None):
+        super(Issue, self).__init__(config, id)
+        self._inst = inst
+
+    def exists(self):
+        return self._getInst() is not None
+
+    def _getInst(self):
+        if self._inst: return self._inst
+        inst = self.config.repo().get_issue(self.id)
+        self._inst = inst
+        return inst
+
+    def __getattr__(self, attr):
+        return getattr(self._getInst(), attr)
+
+
 class Milestone(_GHItem):
     def __init__(self, name, id=None, config=None):
         super(Milestone, self).__init__(config, name)
@@ -228,3 +246,23 @@ class Release(_GHItem):
         inst = self.config.repo().get_release(self.tag)
         self._inst = inst
         return inst
+
+
+def find_issues(config=None, **kwargs):
+    """Search for issues. Valid keyword parameters:
+    - milestone: a github.Milestone instance
+    - state: "open" or "closed"
+    - assignee: username
+    - sort: string
+    - direction: string
+    - since: datetime.datetime
+    """
+    # convert our Milestone into a PyGithub Milestone
+    if 'milestone' in kwargs:
+        m = kwargs['milestone']
+        if isinstance(m, Milestone):
+            kwargs['milestone'] = m._getInst()
+
+    found = _GHItem(config).config.repo().get_issues(**kwargs)
+    return [Issue(issue.id, config=config, inst=issue)
+            for issue in found]

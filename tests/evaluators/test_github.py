@@ -40,8 +40,15 @@ class FakeRepo:
     def __init__(self):
         self.milestones = {}
         self.releases = {}
+        self.issues = {}
         self.owner = 'firefly'
         self.name = 'serenity'
+
+        self.lastIssuesArgs = None
+
+    def get_issues(self, **kwargs):
+        self.lastIssuesArgs = kwargs
+        return self.issues.viewvalues()
 
     def get_milestone(self, number):
         return self.milestones.get(number)
@@ -85,6 +92,30 @@ def repo(conf):
 @pytest.fixture
 def http():
     return FakeHttp()
+
+
+class TestFindIssues:
+    def test_replace_milestone(self, conf, repo):
+        repo.milestones[1] = GhObj({
+            "number": 1,
+            "title": "keep-flyin"
+        })
+
+        milestone = github.Milestone("keep-flyin", config=conf)
+        github.find_issues(conf, milestone=milestone)
+        assert repo.lastIssuesArgs is not None
+        assert repo.lastIssuesArgs['milestone'] == repo.milestones[1]
+
+    def test_find(self, conf, repo):
+        repo.issues[1] = GhObj({
+            "id": 1,
+            "title": "Replace the compression coil"
+        })
+
+        issues = github.find_issues(conf)
+        assert len(issues) == 1
+        assert isinstance(issues[0], github.Issue)
+        assert issues[0].title == 'Replace the compression coil'
 
 
 class TestMilestone:
