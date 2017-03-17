@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import os
 from urllib import urlencode
 
-from github import Github
+from github import Github, Label
 
 from . import git
 from .base import File
@@ -88,8 +88,9 @@ class _GHItem(Evaluator):
 
 
 class Issue(_GHItem):
-    def __init__(self, id, config=None, inst=None):
-        super(Issue, self).__init__(config, id)
+    def __init__(self, number, config=None, inst=None):
+        super(Issue, self).__init__(config, number)
+        self.number = number
         self._inst = inst
 
     def exists(self):
@@ -97,11 +98,16 @@ class Issue(_GHItem):
 
     def _getInst(self):
         if self._inst: return self._inst
-        inst = self.config.repo().get_issue(self.id)
+        inst = self.config.repo().get_issue(self.number)
         self._inst = inst
         return inst
 
     def __getattr__(self, attr):
+        if attr == 'labels':
+            # lazy-inflate labels
+            self.labels = [label.name for label in self._getInst().labels]
+            return self.labels
+
         return getattr(self._getInst(), attr)
 
 
@@ -248,11 +254,21 @@ class Release(_GHItem):
         return inst
 
 
+def _toLabel(labelOrString):
+    if isinstance(labelOrString, Label.Label):
+        return labelOrString
+
+    # minor hacks to avoid unnecessary network calls:
+    return Label.Label(requester=None, headers=None, completed=True,
+            attributes={'name': labelOrString})
+
+
 def find_issues(config=None, **kwargs):
     """Search for issues. Valid keyword parameters:
     - milestone: a github.Milestone instance
     - state: "open" or "closed"
     - assignee: username
+    - labels: list of string label names
     - sort: string
     - direction: string
     - since: datetime.datetime
@@ -263,6 +279,11 @@ def find_issues(config=None, **kwargs):
         if isinstance(m, Milestone):
             kwargs['milestone'] = m._getInst()
 
+    # convert string labels into PyGithub Labels
+    if 'labels' in kwargs:
+        labels = kwargs['labels']
+        kwargs['labels'] = [_toLabel(l) for l in labels]
+
     found = _GHItem(config).config.repo().get_issues(**kwargs)
-    return [Issue(issue.id, config=config, inst=issue)
+    return [Issue(issue.number, config=config, inst=issue)
             for issue in found]

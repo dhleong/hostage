@@ -46,6 +46,9 @@ class FakeRepo:
 
         self.lastIssuesArgs = None
 
+    def get_issue(self, number):
+        return self.issues.get(number)
+
     def get_issues(self, **kwargs):
         self.lastIssuesArgs = kwargs
         return self.issues.viewvalues()
@@ -106,9 +109,19 @@ class TestFindIssues:
         assert repo.lastIssuesArgs is not None
         assert repo.lastIssuesArgs['milestone'] == repo.milestones[1]
 
-    def test_find(self, conf, repo):
+    def test_replace_labels(self, conf, repo):
+        repo.milestones[1] = GhObj({
+            "number": 1,
+            "title": "keep-flyin"
+        })
+
+        github.find_issues(conf, labels=['urgent'])
+        assert repo.lastIssuesArgs is not None
+        assert getattr(repo.lastIssuesArgs['labels'][0], 'name') == 'urgent'
+
+    def test_find_all(self, conf, repo):
         repo.issues[1] = GhObj({
-            "id": 1,
+            "number": 1,
             "title": "Replace the compression coil"
         })
 
@@ -116,6 +129,22 @@ class TestFindIssues:
         assert len(issues) == 1
         assert isinstance(issues[0], github.Issue)
         assert issues[0].title == 'Replace the compression coil'
+
+
+class TestIssue:
+    def test_labels_to_strings(self, conf, repo):
+        repo.issues[1] = GhObj({
+            "number": 1,
+            "title": "Replace the compression coil",
+            "labels": [
+                GhObj({
+                    "name": "urgent"
+                })
+            ]
+        })
+
+        issue = github.Issue(1, config=conf)
+        assert issue.labels == ['urgent']
 
 
 class TestMilestone:
