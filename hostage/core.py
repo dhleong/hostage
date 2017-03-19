@@ -9,10 +9,11 @@ from abc import ABCMeta, abstractmethod
 
 from evaluator import Evaluator
 
+
 class Result:
 
     def __init__(self, value=None):
-        self.value = value;
+        self.value = value
 
     def orElse(self, handler):
         if not self.value:
@@ -39,6 +40,7 @@ class Result:
         else:
             return handler.invoke(self.value)
 
+
 class Handler:
     __metaclass__ = ABCMeta
 
@@ -57,6 +59,7 @@ class Handler:
     def call(self, *args):
         pass
 
+
 def verify(value):
 
     if isinstance(value, Evaluator):
@@ -68,6 +71,7 @@ def verify(value):
     else:
         return Result(value)
 
+
 class Filter:
     __metaclass__ = ABCMeta
 
@@ -75,11 +79,31 @@ class Filter:
     def run(self, value):
         pass
 
+    @staticmethod
+    def wrap(obj):
+        """Given an object that should be used as some sort
+        of Filter, wrap it up into an instance of Filter, if it
+        isn't already one"""
+        if isinstance(obj, Filter):
+            return obj
+        # TODO: functions
+        else:
+            return RegexFilter(obj)
+
+
 class RegexFilter(Filter):
+    regexType = type(re.compile(''))
+
     def __init__(self, regex):
-        self.regex = re.compile(regex)
+        if isinstance(regex, RegexFilter.regexType):
+            self.regex = regex
+        else:
+            self.regex = re.compile(regex)
 
     def run(self, value):
         m = self.regex.search(value)
         if m:
-            return m.group(1)
+            try:
+                return m.group(1)
+            except:
+                return True

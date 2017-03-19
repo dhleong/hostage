@@ -34,6 +34,11 @@ class TestTag:
         assert date.minute == 30
         assert date.tzinfo is not None
 
+    def test_latest(self):
+        tag = git.Tag.latest(filter="0.3.*")
+        assert tag is not None
+        assert tag.name == "0.3.0"
+
 
 class TestLog:
     def test_output(self):

@@ -1,7 +1,7 @@
 
 import dateutil.parser
 
-from ..core import Evaluator
+from ..core import Evaluator, Filter
 from .base import Execute
 
 
@@ -42,6 +42,31 @@ class Tag(Evaluator):
             args.append("--force")
 
         return Execute(args).succeeds()
+
+    @staticmethod
+    def latest(filter=None, branch="master", searchDepth=10):
+        """Get the most recent Tag on the given branch; useful for
+        grabbing all commit logs between now and the last release,
+        for example. You may optionally provide a Filter to
+        restrict the possible candidates"""
+        commitsRaw = Execute("git", "rev-list", branch, "--tags",
+                "--max-count=%d" % searchDepth).output()
+        if not commitsRaw: return None
+
+        commits = [c for c in commitsRaw.split("\n") if c]
+        tagNames = Execute(["git", "describe", "--tags"] +
+                commits).output()
+        if not tagNames: return None
+        tagNames = [t for t in tagNames.split("\n") if t]
+
+        if not filter:
+            # no pattern? just the very first
+            return Tag(tagNames[0])
+
+        filter = Filter.wrap(filter)
+        for tagName in tagNames:
+            if filter.run(tagName):
+                return Tag(tagName)
 
 
 class Log(Execute):
