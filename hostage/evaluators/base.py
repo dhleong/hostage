@@ -5,7 +5,8 @@
 import os.path
 import subprocess
 
-from ..core import Evaluator, Filter, Result
+from ..core import Evaluator, Filter
+
 
 def _hasAg():
     # TODO we should probably cache this result:
@@ -14,6 +15,7 @@ def _hasAg():
         return True
     except:
         return False
+
 
 class File(Evaluator):
 
@@ -27,7 +29,7 @@ class File(Evaluator):
                 return fp.read()
 
     def delete(self):
-        """Returns True if we were deleted, else 
+        """Returns True if we were deleted, else
         False if we didn't exist in the first place
         """
         if self.exists():
@@ -48,6 +50,7 @@ class File(Evaluator):
 
         return theFilter.run(self.contents())
 
+
 class Execute(Evaluator):
 
     def __init__(self, *params, **kwargs):
@@ -67,33 +70,36 @@ class Execute(Evaluator):
             self.params = list(params)
         self.kwargs = kwargs
 
-    def output(self):
-        """Capture the output of a successful call, 
+    def output(self, errToOut=False):
+        """Capture the output of a successful call,
         else return False
         """
         try:
-            return subprocess.check_output(self.params,\
+            if errToOut:
+                self.kwargs['stderr'] = subprocess.STDOUT
+            return subprocess.check_output(self.params,
                     **self.kwargs)
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError:
             return False
-    
+
     def succeeds(self, silent=True):
         """Ensure an exit code of 0. If silent=True,
         the output will be suppressed.
         """
         try:
             if silent:
-                subprocess.check_output(self.params,\
+                subprocess.check_output(self.params,
                         **self.kwargs)
             else:
-                subprocess.check_call(self.params,\
+                subprocess.check_call(self.params,
                         **self.kwargs)
             return True
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError:
             return False
 
+
 class Grep(Execute):
-    
+
     def __init__(self, text, inDir="."):
         """Executes grep (or `ag`, if available),
         and returns the output.

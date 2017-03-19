@@ -47,7 +47,9 @@ class Tag(Evaluator):
     def on(commitish):
         """Given a  commit-ish, return the name of a tag
         attached to it, or None if there was none"""
-        name = Execute(["git", "describe", "--tags", commitish]).output()
+        name = Execute(["git", "describe",
+            "--tags", "--exact-match",
+            commitish]).output(errToOut=True)
         if name:
             return Tag(name.strip())
 
@@ -57,13 +59,18 @@ class Tag(Evaluator):
         grabbing all commit logs between now and the last release,
         for example. You may optionally provide a Filter to
         restrict the possible candidates"""
+
+        # NOTE: this is less efficient than passing all the
+        # tags to a single `git describe` call, but that wouldn't
+        # support a Filter object (we could possibly use --match
+        # if it's just a string regex, but that would be a bummer
+        # to enforce API-wise). Also, even using a single `describe`
+        # call with the output of rev-list is not always best, since
+        # that will barf if a tag doesn't actually exist....
         commitsRaw = Execute("git", "rev-list", branch, "--tags",
                 "--max-count=%d" % searchDepth).output()
         if not commitsRaw: return None
 
-        # NOTE: this is less efficient than passing all the
-        # tags to a single `git describe` call, but sometimes
-        # that will barf if a tag doesn't actually exist....
         commits = [c for c in commitsRaw.split("\n") if c]
         tags = [Tag.on(c) for c in commits]
         tags = [t for t in tags if t]

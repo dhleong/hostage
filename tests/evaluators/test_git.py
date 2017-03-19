@@ -39,6 +39,15 @@ class TestTag:
         assert tag is not None
         assert tag.name == '0.6.0'
 
+    def test_fromCommitish_404(self, capfd):
+        tag = git.Tag.on('13f7f07')
+        assert tag is None
+
+        # no garbage output:
+        out, err = capfd.readouterr()
+        assert not out
+        assert not err
+
     def test_latest(self):
         # pick a specific branch to ensure travis doesn't
         #  have a fit
