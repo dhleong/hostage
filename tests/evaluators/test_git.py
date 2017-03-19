@@ -35,7 +35,16 @@ class TestTag:
         assert date.tzinfo is not None
 
     def test_latest(self):
-        tag = git.Tag.latest(filter="0.3.*")
+        # pick a specific branch to ensure travis doesn't
+        #  have a fit
+        branch = git.Repo().branch()
+        if not branch:
+            # NOTE: when travis runs for a release tag,
+            # it won't have the `master` branch. So, we
+            # can just use HEAD
+            branch = 'HEAD'
+
+        tag = git.Tag.latest(filter="0.3.*", branch=branch)
         assert tag is not None
         assert tag.name == "0.3.0"
 

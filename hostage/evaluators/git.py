@@ -105,3 +105,8 @@ class Repo(Evaluator):
         path = Execute("git rev-parse --show-toplevel").output()
         if path:
             return path.strip()
+
+    def branch(self):
+        branch = Execute("git rev-parse --abbrev-ref HEAD").output()
+        if branch and not branch.startswith('HEAD'):
+            return branch.strip()
