@@ -44,6 +44,14 @@ class Tag(Evaluator):
         return Execute(args).succeeds()
 
     @staticmethod
+    def on(commitish):
+        """Given a  commit-ish, return the name of a tag
+        attached to it, or None if there was none"""
+        name = Execute(["git", "describe", "--tags", commitish]).output()
+        if name:
+            return Tag(name.strip())
+
+    @staticmethod
     def latest(filter=None, branch="master", searchDepth=10):
         """Get the most recent Tag on the given branch; useful for
         grabbing all commit logs between now and the last release,
@@ -53,20 +61,22 @@ class Tag(Evaluator):
                 "--max-count=%d" % searchDepth).output()
         if not commitsRaw: return None
 
+        # NOTE: this is less efficient than passing all the
+        # tags to a single `git describe` call, but sometimes
+        # that will barf if a tag doesn't actually exist....
         commits = [c for c in commitsRaw.split("\n") if c]
-        tagNames = Execute(["git", "describe", "--tags"] +
-                commits).output()
-        if not tagNames: return None
-        tagNames = [t for t in tagNames.split("\n") if t]
+        tags = [Tag.on(c) for c in commits]
+        tags = [t for t in tags if t]
+        if not tags: return None
 
         if not filter:
             # no pattern? just the very first
-            return Tag(tagNames[0])
+            return tags[0]
 
         filter = Filter.wrap(filter)
-        for tagName in tagNames:
-            if filter.run(tagName):
-                return Tag(tagName)
+        for tag in tags:
+            if filter.run(tag.name):
+                return tag
 
 
 class Log(Execute):

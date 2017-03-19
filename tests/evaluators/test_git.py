@@ -34,6 +34,11 @@ class TestTag:
         assert date.minute == 30
         assert date.tzinfo is not None
 
+    def test_fromCommitish(self):
+        tag = git.Tag.on('08d03e3')
+        assert tag is not None
+        assert tag.name == '0.6.0'
+
     def test_latest(self):
         # pick a specific branch to ensure travis doesn't
         #  have a fit
