@@ -54,7 +54,7 @@ class Tag(Evaluator):
             return Tag(name.strip())
 
     @staticmethod
-    def latest(filter=None, branch="master", searchDepth=10):
+    def latest(filter=None, branch="master", searchDepth=100):
         """Get the most recent Tag on the given branch; useful for
         grabbing all commit logs between now and the last release,
         for example. You may optionally provide a Filter to
