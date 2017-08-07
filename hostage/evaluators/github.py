@@ -166,6 +166,47 @@ class Milestone(_GHItem):
         return self.id
 
 
+class RepoFile(_GHItem):
+
+    """A file in a Github Repo"""
+
+    def __init__(self, path, config=None):
+        """
+
+        :path: Path to the file
+
+        """
+        super(RepoFile, self).__init__(config, path)
+
+        self.path = path
+        self._inst = None
+
+    def read(self):
+        """Get the original contents"""
+        return self._getInst().decoded_content
+
+    def write(self, contents, commitMessage=None):
+        """Set the file's contents"""
+        oldSha = self._getInst().sha
+
+        if commitMessage is None:
+            commitMessage = "Updated %s" % self.path
+
+        self.config.repo().update_file(
+            self.path,
+            commitMessage,
+            contents,
+            oldSha)
+
+        return True
+
+    def _getInst(self):
+        if self._inst: return self._inst
+        inst = self.config.repo().get_file_contents(self.path)
+        self._inst = inst
+        return inst
+
+
 class Release(_GHItem):
 
     """Update a Github Release"""
