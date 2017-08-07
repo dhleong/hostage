@@ -3,7 +3,13 @@
 # Git class tests
 #
 
+import os
+
 from hostage.evaluators import git
+
+
+def isShallowClone():
+    return os.path.exists(os.path.join(git.Repo().root(), '.git/shallow'))
 
 
 class TestTag:
@@ -65,11 +71,20 @@ class TestTag:
 
 class TestLog:
     def test_output(self):
+        if isShallowClone():
+            # we can't properly run this test with a shallow clone (eg: travis)
+            # TODO: can we rewrite these to somehow work on shallow clones?
+            return
+
         log = git.Log(path="946b5ac..3dd3811", pretty="format:- %s")
         res = log.output()
         assert res == "- Convert git stuff to new Evaluator"
 
     def test_grepList(self):
+        if isShallowClone():
+            # we can't properly run this test with a shallow clone (eg: travis)
+            return
+
         log = git.Log(path="946b5ac..cfa1271",
                 grep=["test for git.Log", "github milestone"],
                 pretty="format:%s")
@@ -78,6 +93,10 @@ class TestLog:
                       "Add test for git.Log"
 
     def test_grepString(self):
+        if isShallowClone():
+            # we can't properly run this test with a shallow clone (eg: travis)
+            return
+
         log = git.Log(path="946b5ac..cfa1271",
                 grep="test for git.Log",
                 pretty="format:%s")
