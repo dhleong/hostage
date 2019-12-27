@@ -34,10 +34,10 @@ if sys.argv[-1] == 'publish':
 packages = find_packages(exclude=["tests", "tests.*"])
 
 requires = [
-    'python-dateutil>=2.6.0',
+    'python-dateutil~=2.6.0',
     'requests>=2.10.0',
     'PyGithub~=1.44.1',
-    'google-api-python-client>=1.3.2'
+    'google-api-python-client~=1.5.0'
 ]
 
 test_requirements = ['pytest>=2.6.0', 'responses>=0.5.1', 'mock']
