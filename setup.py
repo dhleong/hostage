@@ -36,7 +36,7 @@ packages = find_packages(exclude=["tests", "tests.*"])
 requires = [
     'python-dateutil>=2.6.0',
     'requests>=2.10.0',
-    'PyGithub>=1.26.0',
+    'PyGithub~=1.44.1',
     'google-api-python-client>=1.3.2'
 ]
 

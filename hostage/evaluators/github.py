@@ -178,7 +178,10 @@ class RepoFile(_GHItem):
         """
         super(RepoFile, self).__init__(config, path)
 
-        self.path = path
+        if path.startswith("/"):
+            self.path = path[1:]
+        else:
+            self.path = path
         self._inst = None
 
     def read(self):
@@ -202,7 +205,7 @@ class RepoFile(_GHItem):
 
     def _getInst(self):
         if self._inst: return self._inst
-        inst = self.config.repo().get_file_contents(self.path)
+        inst = self.config.repo().get_contents(self.path)
         self._inst = inst
         return inst
 
