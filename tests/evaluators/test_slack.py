@@ -18,5 +18,5 @@ def test_Notifier_notify():
     assert res == True
 
     sent = responses.calls[0].request.body
-    assert sent == '{"text": "Foo"}'
+    assert sent == b'{"text": "Foo"}'
 

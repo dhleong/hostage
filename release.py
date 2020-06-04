@@ -12,8 +12,8 @@ version = verify(File('hostage/__init__.py')\
 tag = git.Tag(version)
 verify(tag.exists()).then(echoAndDie("Version %s already exists" % version))
 
-verify(Execute('python setup.py test')).succeeds(silent=False)
-verify(Execute('python setup.py publish')).succeeds(silent=False)
+verify(Execute('python3 setup.py test')).succeeds(silent=False)
+verify(Execute('python3 setup.py publish')).succeeds(silent=False)
 
 verify(tag).create()
 verify(tag).push('origin')

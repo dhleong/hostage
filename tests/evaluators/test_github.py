@@ -51,7 +51,7 @@ class FakeRepo:
 
     def get_issues(self, **kwargs):
         self.lastIssuesArgs = kwargs
-        return self.issues.viewvalues()
+        return self.issues.values()
 
     def get_milestone(self, number):
         return self.milestones.get(number)
