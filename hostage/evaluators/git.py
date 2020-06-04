@@ -96,7 +96,7 @@ class Log(Execute):
     def _toCli(path, grep, invertGrep, pretty):
         args = ["git", "log", path]
 
-        if isinstance(grep, basestring):
+        if isinstance(grep, str):
             args.append("--grep=" + grep.replace("#", "\#"))
         elif type(grep) is list:
             for item in grep:

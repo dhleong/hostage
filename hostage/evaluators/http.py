@@ -3,8 +3,8 @@
 #
 
 from os.path import getsize
-from urllib import urlencode
-import urllib2
+from urllib.parse import urlencode
+import urllib.request, urllib.error, urllib.parse
 import json as JSON
 
 from ..core import Evaluator
@@ -92,7 +92,7 @@ class HttpResult(object):
 class Http(Evaluator):
 
     def __init__(self):
-        self._opener = urllib2.build_opener(urllib2.HTTPSHandler)
+        self._opener = urllib.request.build_opener(urllib.request.HTTPSHandler)
 
     def get(self, url):
         """GET the URL.
@@ -167,9 +167,9 @@ class Http(Evaluator):
             else:
                 headers['Content-Length'] = len(data)
 
-        req = urllib2.Request(url, data, headers)
+        req = urllib.request.Request(url, data, headers)
         req.get_method = lambda: method  # hax to support PUT
         try:
             return HttpResult(self._opener.open(req))
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             raise e

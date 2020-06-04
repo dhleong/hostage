@@ -7,7 +7,7 @@ import sys
 import inspect
 from abc import ABCMeta, abstractmethod
 
-from evaluator import Evaluator
+from .evaluator import Evaluator
 
 
 class Result:
@@ -41,8 +41,7 @@ class Result:
             return handler.invoke(self.value)
 
 
-class Handler:
-    __metaclass__ = ABCMeta
+class Handler(metaclass=ABCMeta):
 
     def __init__(self):
         self.value = None
@@ -72,8 +71,7 @@ def verify(value):
         return Result(value)
 
 
-class Filter:
-    __metaclass__ = ABCMeta
+class Filter(metaclass=ABCMeta):
 
     @abstractmethod
     def run(self, value):

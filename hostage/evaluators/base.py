@@ -62,7 +62,7 @@ class Execute(Evaluator):
         commands, pass as an array
         """
         super(Execute, self).__init__(*params)
-        if len(params) == 1 and isinstance(params[0], basestring):
+        if len(params) == 1 and isinstance(params[0], str):
             self.params = params[0].split(" ")
         elif len(params) == 1 and type(params[0]) is list:
             self.params = params[0]
@@ -78,7 +78,8 @@ class Execute(Evaluator):
             if errToOut:
                 self.kwargs['stderr'] = subprocess.STDOUT
             return subprocess.check_output(self.params,
-                    **self.kwargs)
+                                           text=True,
+                                           **self.kwargs)
         except subprocess.CalledProcessError:
             return False
 

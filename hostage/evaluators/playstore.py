@@ -66,7 +66,7 @@ class Update(Evaluator):
             self._log("Version code %d has been uploaded" % versionCode)
 
             if self.whatsnew:
-                for lang, msg in self.whatsnew.iteritems():
+                for lang, msg in self.whatsnew.items():
                     self._log("Updating `what's new` for %s..." % lang)
 
                     whatsnewResponse = service.edits().apklistings().update(
@@ -83,7 +83,7 @@ class Update(Evaluator):
                 editId=editId,
                 track=self.track,
                 packageName=self.package,
-                body={u'versionCodes': [versionCode]}).execute()
+                body={'versionCodes': [versionCode]}).execute()
 
             self._log('Track %s is set for version code(s) %s; committing changes...' \
                     % (trackResponse['track'], str(trackResponse['versionCodes'])))
@@ -127,7 +127,7 @@ class Update(Evaluator):
             raise Exception("`whatsnew` must be a dict of lang -> notes")
 
         elif self.whatsnew:
-            for (lang, msg) in self.whatsnew.iteritems():
+            for (lang, msg) in self.whatsnew.items():
                 if len(msg) > 500:
                     raise Exception("`whatsnew` for `%s` is > 500 chars" % lang)
 

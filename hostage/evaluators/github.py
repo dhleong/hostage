@@ -2,11 +2,8 @@
 # Github actions
 #
 
-
-from __future__ import absolute_import
-
 import os
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from github import Github, Label
 

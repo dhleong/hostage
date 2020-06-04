@@ -13,7 +13,7 @@ class Notifier(Evaluator):
         self.url = url
 
     def notify(self, payload):
-        if isinstance(payload, basestring):
+        if isinstance(payload, str):
             payload = {"text": payload}
         r = requests.post(self.url, json=payload)
         return r.status_code in [200, 204]
