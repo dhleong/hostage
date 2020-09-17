@@ -2,6 +2,7 @@
 # HTTP
 #
 
+from io import IOBase
 from os.path import getsize
 from urllib.parse import urlencode
 import urllib.request, urllib.error, urllib.parse
@@ -162,7 +163,7 @@ class Http(Evaluator):
             data = None
 
         if method == 'POST' and body:
-            if type(body) == file:
+            if isinstance(body, IOBase):
                 headers['Content-Length'] = getsize(body.name)
             else:
                 headers['Content-Length'] = len(data)
